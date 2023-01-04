@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name='Title' content='저두'>
+    <meta name='Subject' content='저두'>
+    <meta name='Keywords' content='저두 레슨 취미 클래스 저스트두 이벤트'>
+    <meta name='Author' content='minjeong'>
+    <meta name='Publisher' content='minjeong'>
+    <meta name='Description' content='저두 오신 것을 환영합니다.'>
+    <meta name='Author-Date' content='20220323'>
+    <meta name='Robots' content='index,follow'>
+    <link rel="icon" type="images/png" href="/images/logo.png" />
+    <link rel="manifest" href="/manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    
+    <title>저두: 저스트두 - 600만명이 선택한 생활서비스 멘토 매칭</title>
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/board_style.css">
+    <link rel="stylesheet" href="/css/board_media.css">
+
+    <script src="/js/script.js" defer></script>
+
+    <!-- header, footer 공통 부분 -->
+    <script src="/code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">   
+        $(document).ready( function() {
+
+        $("#headers").load("common/header.html");  // 원하는 파일 경로를 삽입하면 된다
+        $("#footers").load("common/footer.html");  // 추가 인클루드를 원할 경우 이런식으로 추가하면 된다
+        $("#searcher").load("common/search.html");  
+    });
+    </script>
+
+</head>
+
+<body>
+    <ul id="skip">
+        <li><a href="#header">헤더 바로가기</a></li>
+        <li><a href="#nav">메뉴 바로가기</a></li>
+        <li><a href="#footer">푸터 바로가기</a></li>
+    </ul>
+    <header>
+    	<th:bloack th:replace="fragments/header.html :: header(${loginState}, ${nickname}, ${thumbnail_image}, ${profile_image})"></th:bloack>
+    </header>
+    <th:bloack th:replace="fragments/search.html :: search"></th:bloack>
+    <div class="board_wrap">
+        <div class="board_title">
+            <strong>게시글 상세</strong>
+        </div>
+        <div class="board_view_wrap">
+        		<div class="board-top-btn">
+        			<div class="qwe">
+	                <dl style="display: flex;">
+	                	<dt class="board-title">제목</dt>
+	                	<dd class="title-line"></dd>
+	                	<dd class="board-titlename" th:text="${boardView.title}"></dd>
+	                </dl>
+	                </div>
+	                <div class="bt_wrap">
+	                <a  href="list.html" class="on" th:href="@{/board/boardList(page=${param.page})}">목록</a>
+	                </div>
+	            </div>
+            <div class="board_view">
+                <div class="info">
+                    <dl>
+                        <dt>번호</dt>
+                        <dd th:text="${boardView.id}"></dd>
+                    </dl>
+                    <dl>
+                        <dt>글쓴이</dt>
+                        <dd th:text="${boardView.account.name}"></dd>
+                    </dl>
+                    <dl>
+                        <dt>작성일</dt>
+                        <dd th:text="${boardView.startDate}"></dd>
+                    </dl>
+                    <dl>
+                        <dt>조회</dt>
+                        <dd th:text="${boardView.views}"></dd>
+                    </dl>
+                    	<hr>
+                		<div class="cont" th:text="${boardView.content}"></div>
+                </div>
+                	<div class="bt_wrap">
+		                <div class="qwe"></div>
+		                <div class="asd">
+							<th:block th:if="${isSameId}=='true'">
+				                <a href="edit.html" th:href="@{/board/boardDelete/{id}(id=${boardView.id})}">삭제</a>
+				                <a href="edit.html" th:href="@{/board/boardEdit/{id}(id=${boardView.id})}" class="on">수정</a>
+			                </th:block>
+		            	</div>
+            		</div>
+                <div style="padding: 1em;"></div>
+                
+                <!-- 댓글 -->
+                <div class="card mb-2">
+                    <div class="card-header bg-light">
+                        <i class="fa fa-comment fa"></i> 댓글
+                    </div>
+                    
+                    <form th:object="${replyFormDto}" name="commentForm" th:action="@{/board/commentWriteSub/{id}(id=${boardView.id})}" method="post">
+	                    <div class="card-body">
+	                        <ul class="list-group list-group-flush">
+	                            <li class="list-group-item">
+	                                <textarea th:field="*{content}" th:errorclass="reply-error" name="content" class="form-control" rows="3"></textarea>
+	                                <div class="reply-error" th:errors="*{content}" style="color: tomato;">댓글 오류</div>
+	                            </li>
+	                        </ul>
+	                            <div>
+	                                <a href="javascript:commentForm.submit();" type="button" class="btn btn-dark mt-3">댓글달기</a>
+	                           </div>
+	                    </div>
+                    </form>
+                    
+                </div>
+                
+	                <div class="comment-box" th:each="reply : ${replyList}">
+	                	<dl>
+	                		<dt class="comment-id" th:text="${replyStat.count}"></dt>
+	                		<dd class="comment" th:text="${reply.account.name}"></dd>
+	                		<dd style="display: flex;">
+	                		<span class="line" ></span>
+	                		<span class="com-content" th:text="${reply.content}"></span>
+	                		</dd>
+			                <dd class="comment-up-del">
+			                	<span>작성일 : </span>
+			                	<span class="com-date" th:text="${reply.startDate}"></span>
+			                	<span style="display: flex; justify-content: space-between; margin-top: 5px;">
+			                	<span class="qwe"></span>
+			                	<span class="asd">
+			                	<th:block th:if="${reply.account.id}==${credentialId}">
+			                	<a class="comment-btn">수정</a>
+			                	<a class="comment-btn" th:href="@{/board/commentDelete/{boardId}/{replyId}(boardId=${boardView.id}, replyId=${reply.id})}">삭제</a>
+			                	</th:block>
+			                	</span>
+			                	</span>
+			                </dd>
+	                	</dl>
+	                </div>
+            </div>
+                
+            <div style="padding: 1em;"></div>
+                
+           
+        </div>
+    </div>
+    <div style="padding: 15px"></div>
+    <footer>
+<!--         <th:bolack th:replace="fragments/footer.html :: footer"></th:bolack> -->
+    </footer>
+</body>
+
+</html>
